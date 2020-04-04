@@ -10,26 +10,36 @@
 #include <type_traits>
 #include <variant>
 
-#include "common/bit_util.h"
+#include "backend/interpreter/vector.h"
 #include "common/cast_util.h"
 #include "common/common_types.h"
 
 namespace Dynarmic::Backend::Interpreter {
 
 template <typename T>
-using VectorOf = std::array<T, 128 / Common::BitSize<T>()>;
-using Vector = std::array<u64, 2>;
-
-template <typename T>
 struct ResultAndCarry {
     T result;
     bool carry;
+
+    operator ResultAndCarry<std::make_unsigned_t<T>>() const {
+        return {
+            static_cast<std::make_unsigned_t<T>>(result),
+            carry
+        };
+    }
 };
 
 template <typename T>
 struct ResultAndOverflow {
     T result;
     bool overflow;
+
+    operator ResultAndOverflow<std::make_unsigned_t<T>>() const {
+        return {
+            static_cast<std::make_unsigned_t<T>>(result),
+            overflow
+        };
+    }
 };
 
 template <typename T>
@@ -37,6 +47,14 @@ struct ResultAndCarryAndOverflow {
     T result;
     bool carry;
     bool overflow;
+
+    operator ResultAndCarryAndOverflow<std::make_unsigned_t<T>>() const {
+        return {
+            static_cast<std::make_unsigned_t<T>>(result),
+            carry,
+            overflow
+        };
+    }
 };
 
 template <typename T>
@@ -46,17 +64,47 @@ struct ResultAndNZCV {
     bool zero;
     bool carry;
     bool overflow;
+
+    operator ResultAndNZCV<std::make_unsigned_t<T>>() const {
+        return {
+            static_cast<std::make_unsigned_t<T>>(result),
+            negative,
+            zero,
+            carry,
+            overflow
+        };
+    }
 };
 
 template <typename T>
 struct ResultAndGE {
     T result;
     u32 ge;
+
+    operator ResultAndGE<std::make_unsigned_t<T>>() const {
+        return {
+            static_cast<std::make_unsigned_t<T>>(result),
+            ge
+        };
+    }
 };
 
 struct UpperAndLower {
     Vector upper;
     Vector lower;
+};
+
+template <typename T>
+struct UpperAndLowerOf {
+    VectorOf<T> upper;
+    VectorOf<T> lower;
+
+    operator UpperAndLower() const {
+        return {
+            Common::BitCast<Vector>(upper),
+            Common::BitCast<Vector>(lower)
+        };
+    }
 };
 
 struct Value {
@@ -130,7 +178,7 @@ struct Value {
     }
 
 private:
-    using Variant = std::variant<std::monostate, 
+    using Variant = std::variant<std::monostate,
         bool, u8, u16, u32, u64, Vector,
         ResultAndCarry<u32>,
         ResultAndCarryAndOverflow<u32>,
