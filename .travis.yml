@@ -30,10 +30,16 @@ matrix:
             - ninja-build
       install: ./.travis/build-x86_64-linux/deps.sh
       script: ./.travis/build-x86_64-linux/build.sh
-    - env: NAME="macOS Build"
+    - env: NAME="macOS Build (XCode 10.1 on macOS 10.13)"
       os: osx
       sudo: false
-      osx_image: xcode10.2
+      osx_image: xcode10.1
+      install: ./.travis/build-x86_64-macos/deps.sh
+      script: ./.travis/build-x86_64-macos/build.sh
+    - env: NAME="macOS Build (XCode 11.3 on macOS 10.14)"
+      os: osx
+      sudo: false
+      osx_image: xcode11.3
       install: ./.travis/build-x86_64-macos/deps.sh
       script: ./.travis/build-x86_64-macos/build.sh
 #    - env: NAME="Test - Fuzz against Unicorn"
