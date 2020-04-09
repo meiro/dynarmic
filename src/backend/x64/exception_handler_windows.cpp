@@ -204,7 +204,7 @@ struct ExceptionHandler::Impl final {
         except_info->ExceptionHandler = static_cast<ULONG>(exception_handler - code.getCode<u8*>());
 
         code.align(16);
-        RUNTIME_FUNCTION* rfuncs = static_cast<RUNTIME_FUNCTION*>(code.AllocateFromCodeSpace(sizeof(RUNTIME_FUNCTION)));
+        rfuncs = static_cast<RUNTIME_FUNCTION*>(code.AllocateFromCodeSpace(sizeof(RUNTIME_FUNCTION)));
         rfuncs->BeginAddress = static_cast<DWORD>(0);
         rfuncs->EndAddress = static_cast<DWORD>(code.GetTotalCodeSize());
         rfuncs->UnwindData = static_cast<DWORD>(reinterpret_cast<u8*>(unwind_info) - code.getCode());
